@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  ts-node-docker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - .:/app
+    container_name: ts-node-docker
+    # command: npm run dev
+    expose:
+      - 8082
+      - 8083
+      - 8084
+    ports:
+      - 8082:8082
+      - 8083:8083
+      - 8084:8084
+    command: yarn dockerStart

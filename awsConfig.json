@@ -1,0 +1,10 @@
+{
+    "development": {
+      "aws_region": "us-east-2c",
+      "username": "lvanleynseele",
+      "database": "postgres",
+      "password": "ZT9qb5egpl6gDAsrHrVp",
+      "host": "borealis-1-instance-1.cg0olqywuwsh.us-east-2.rds.amazonaws.com",
+      "port": 5432
+    }
+  }

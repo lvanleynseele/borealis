@@ -1,0 +1,107 @@
+// import path = require("path");
+import "./account.proto"; //check syntax on this
+
+syntax = "proto3";
+
+package userPackage;
+
+service UserService {
+  rpc AddUser (AddUserRequest) returns (AddUserResponse){
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "*"
+    };
+  };
+  rpc AddMultipleUsers(stream AddMultipleUsersRequest) returns (AddMultipleUsersResponse){
+    option (google.api.http) = {
+      post: "/v1/users/multiple"
+      body: "*"
+    };
+  };
+  rpc AddAccount(AddAccountRequest) returns (AddAccountResponse){
+    option (google.api.http) = {
+      post: "/v1/users/{userId}/accounts"
+      body: "*"
+    };
+  };
+  rpc GetUser (GetUserRequest) returns (GetUserResponse){
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  };
+  rpc GetAllUsers(Empty) returns (stream GetAllUsersResponse){
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  };
+  rpc DeleteUser(DeleteUserRequest) returns (Empty){
+    option (google.api.http) = {
+      delete: "/v1/users/{id}"
+    };
+  };
+  rpc DeleteAccount(DeleteAccountRequest) returns (Empty){
+    option (google.api.http) = {
+      delete: "/v1/users/{userId}/accounts/{accountId}"
+    };
+  };
+}
+
+message Empty {}
+
+message User {
+  required string id = 1;
+  required string name = 2;
+  string email = 3;
+  repeated string accountIds = 4;
+}
+
+//requests
+message AddUserRequest {
+  required User user = 1;
+}
+
+message AddMultipleUsersRequest {
+  User users = 1;
+}
+
+message AddAccountRequest {
+  required string userId = 1;
+  required Account account = 2;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetAllUsersRequest {}
+
+message DeleteUserRequest {
+  required string id = 1;
+}
+
+message DeleteAccountRequest {
+  required string userId = 1;
+  required string accountId = 2;
+}
+
+//reponses
+message AddUserResponse {
+  User user = 1;
+}
+
+message AddMultipleUsersResponse {
+  repeated User users = 1;
+}
+
+message AddAccountResponse {
+  string userId = 1;
+  Account account = 2;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message GetAllUsersResponse {
+  User users = 1;
+}

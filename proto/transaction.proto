@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package transactionPackage;
+
+service TransactionService {
+  rpc TransactionRequest (TransactionRequest) returns (TransferResponse){
+    option (google.api.http) = {
+      post: "/transaction"
+      body: "*"
+    };
+  };
+}
+
+
+message TransactionRequest {
+  required string senderId = 1;
+  required string receiverId = 2;
+  required int64 amount = 3;
+}
+
+message TransferResponse {
+
+}
+
+
+

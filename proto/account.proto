@@ -1,0 +1,83 @@
+import "./transaction.proto";
+
+syntax = "proto3";
+
+package accountPackage;
+
+service AccountService {
+  rpc AddAccount (Account) returns (Account){
+    option (google.api.http) = {
+      post: "/v1/accounts"
+      body: "*"
+    };
+  };
+  rpc GetAccount (GetAccountRequest) returns (Account){
+    option (google.api.http) = {
+      get: "/v1/accounts/{id}"
+    };
+  }; //return User with id
+  rpc GetAllAccounts (Empty) returns (stream Account){
+    option (google.api.http) = {
+      get: "/v1/accounts"
+    };
+  };
+  rpc UpdateAccount (UpdateAccountRequest) returns (Account){
+    option (google.api.http) = {
+      put: "/v1/accounts/{id}"
+      body: "*"
+    };
+  };
+  rpc DeleteAccount (DeleteAccountRequest) returns (Empty){
+    option (google.api.http) = {
+      delete: "/v1/accounts/{id}"
+    };
+  };
+  rpc DebitRequest (DebitRequest) returns (TransferResponse){
+    option (google.api.http) = {
+      post: "/v1/accounts/{id}/debit"
+      body: "*"
+    };
+  };
+  rpc CreditRequest (CreditRequest) returns (TransferResponse){
+    option (google.api.http) = {
+      post: "/v1/accounts/{id}/credit"
+      body: "*"
+    };
+  };
+}
+
+
+message Empty {}
+
+message Account {
+  required string id = 1;
+  required string name = 2;
+  required int64 balance = 3;
+}
+
+message GetAccountRequest {
+  required string id = 1;
+}
+
+message UpdateAccountRequest {
+  Account updatedAccount = 1;
+}
+
+message DeleteAccountRequest {
+  string id = 1;
+}
+
+message DebitRequest{
+  required string id = 1;
+  required int64 amount = 2;
+}
+
+message CreditRequest {
+  required string id = 1;
+  required int64 amount = 2;
+}
+
+message TransferResponse {
+  int64 newBalance = 1;
+}
+

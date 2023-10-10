@@ -27,7 +27,6 @@
     "posttest": "npm run lint",
     "proto:gen": "./proto-gen.sh",
     "start": "ts-node index.ts",
-    "dockerStart": "NODE_PATH = ./build  node build/index.js",
     "start:aurora": "ts-node servers/auroraServer.ts",
     "start:account": "ts-node servers/accountServer.ts",
     "start:transaction": "ts-node servers/transactionServer.ts",

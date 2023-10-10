@@ -1,5 +1,5 @@
 const path = require('path');
-import { auroraClient } from '../../servers/auroraServer';
+import { auroraClient } from '../servers/auroraServer';
 import { Account } from "../../proto/accountPackage/Account";
 import { TransferResponse } from '../../proto/accountPackage/TransferResponse';
 

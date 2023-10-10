@@ -1,8 +1,9 @@
-import { startTransactionServer } from "./servers/transactionServer";
-import { startUserServer } from "./servers/userServer";
-import { startAccountServer } from "./servers/accountServer";
-import { startAuroraServer } from "./servers/auroraServer";
+import { startAccountServer } from "./src/servers/accountServer";
+import { startAuroraServer } from "./src/servers/auroraServer";
+import { startTransactionServer } from "./src/servers/transactionServer";
+import { startUserServer } from "./src/servers/userServer";
 
+export const account= {};
 
 startUserServer();
 startTransactionServer();

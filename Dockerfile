@@ -1,14 +1,13 @@
-FROM --platform=linux/arm64/v8 node:20 as base
+FROM --platform=linux/arm64/v8 node:latest AS base
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
+COPY . .
+# COPY package.json yarn.lock tsconfig.json index.ts ./ 
 
 RUN yarn install
 
 COPY . .
 
 CMD [ "yarn", "start" ]
-
-
 

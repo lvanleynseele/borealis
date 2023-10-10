@@ -1,6 +1,6 @@
 const path = require('path');
 import { Account, isAccount } from '../../proto/accountPackage/Account';
-import { auroraClient } from '../../servers/auroraServer';
+import { auroraClient } from '../servers/auroraServer';
 import { User } from "../../proto/userPackage/User";
 import { AddAccountResponse } from '../../proto/userPackage/AddAccountResponse';
 import { AddUserResponse } from '../../proto/userPackage/AddUserResponse';

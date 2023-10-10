@@ -1,11 +1,20 @@
 {
   "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
+    // "rootDir": "./",
+    "outDir": "build",
+    "moduleResolution": "node",
   },
   "include": [
     "src/**/*.ts",
-    "test/**/*.ts"
-, "servers/userServer.ts", "clients/userClient.ts", "servers/accountServer.ts"  ]
+    "src/*.ts",
+    "clients/*.ts",
+    "*.ts",
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "index.ts"
+  ]
 }

@@ -3,12 +3,8 @@
     "@grpc/grpc-js": "^1.9.3",
     "@grpc/proto-loader": "^0.7.9",
     "@protobuf-ts/protoc": "^2.9.1",
-    "aws-sdk": "^2.1468.0",
-    "express": "^4.18.2",
     "mysql": "^2.18.1",
-    "mysql2": "^3.6.1",
     "pg": "^8.11.3",
-    "sequelize": "^6.33.0",
     "ts-node": "^10.9.1"
   },
   "devDependencies": {
@@ -16,7 +12,7 @@
     "@grpc/proto-loader": "^0.7.9",
     "@protobuf-ts/protoc": "^2.9.1",
     "@types/node": "20.4.6",
-    "gts": "^5.0.1",
+    "gts": "^5.2.0",
     "ts-node": "^10.9.1",
     "typescript": "~5.1.6"
   },
@@ -31,7 +27,7 @@
     "posttest": "npm run lint",
     "proto:gen": "./proto-gen.sh",
     "start": "ts-node index.ts",
-    "dockerStart" : "NODE_PATH = ./build  node build/index.js",
+    "dockerStart": "NODE_PATH = ./build  node build/index.js",
     "start:aurora": "ts-node servers/auroraServer.ts",
     "start:account": "ts-node servers/accountServer.ts",
     "start:transaction": "ts-node servers/transactionServer.ts",

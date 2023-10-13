@@ -73,17 +73,27 @@ function getServer() {
                 res(null, null)
             })
         },
-        GetAllUsers : (call) => {
-            let allUsers =  userService.getAllUsers().then((result: any) => {
-                let users: User[] = result;
+        // GetAllUsers : (call) => {
+        //     console.log("GetAllUsers called");
 
-                users.forEach(u => {call.write(u)});
-                call.end();
+        //     let allUsers =  userService.getAllUsers().then((result: any) => {
+        //         let users: User[] = result;
+        //         users.forEach(u => {call.write(u)});
+        //         call.end();
+        //     }).catch((err: any) => {
+        //         console.log(err);
+        //         call.write(err);
+        //         call.end();
+        //     })  
+        // },
+        GetAllUsers : (req, res) => {
+            userService.getAllUsers().then((result: any) => {
+                let users: User[] = result;
+                res(null, {users: users})
             }).catch((err: any) => {
                 console.log(err);
-                call.write(err);
-                call.end();
-            })  
+                res(err, null)
+            })
         },
         // UpdateUser : (req, res) => {
         //     userService.updateUser(req.request.user).then((result: any) => {

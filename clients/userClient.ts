@@ -3,6 +3,8 @@ import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import { ProtoGrpcType } from "../proto/user";
 import { User } from "../proto/userPackage/User";
+import { UserServiceClient } from "../proto/userPackage/UserService";
+import { get } from "http";
 
 const PORT = 8082; //process.env.PORT || 8082;
 const PROTO_FILE = '../proto/user.proto';
@@ -10,17 +12,12 @@ const PROTO_FILE = '../proto/user.proto';
 const packageDef = protoLoader.loadSync(path.resolve(__dirname, PROTO_FILE));
 const grpcObject = grpc.loadPackageDefinition(packageDef) as unknown as ProtoGrpcType;
 
-
-const userClient = new grpcObject.userPackage.UserService (
+export const userClient =  new grpcObject.userPackage.UserService (
     `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
-)
-
-const deadline = new Date();
-deadline.setSeconds(deadline.getSeconds() + 5);
-
+);
 
 export function startUserClient() {
-    userClient.waitForReady(deadline, (err) => {
+    userClient.waitForReady(Infinity, (err) => {
         if (err){
             console.error(err);
             return;
@@ -33,46 +30,76 @@ function onClientReady() {
     console.log('User Client ready');
 }
 
-export {userClient};
 
-export function AddUser(user: User) {
-    userClient.AddUser({user: user}, (err: any, res: any) =>{
-        if (err) {
-            console.error(err);
-            return;
-        }
-        console.log(res);
-    })
+
+export class UserClient {
+    public userClient: UserServiceClient =  new grpcObject.userPackage.UserService (
+        `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
+    );
+
+    constructor() {
+        this.startUserClient();
+    }
+
+    private startUserClient() {
+        this.userClient.waitForReady(Infinity, (err) => {
+            if (err){
+                console.error(err);
+                return;
+            }
+            this.onClientReady()
+        }) 
+    }
+
+    private onClientReady() {
+        console.log('User Client ready');
+    }
+
+    public async  AddUser(user: User) {
+        this.userClient.AddUser({user: user}, (err: any, res: any) =>{
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log(res);
+        })
+    }
+
+    public async GetUser(id: string) {
+        console.log("Getting user with id: " + id);
+        this.userClient.GetUser({id: id}, (err: any, res: any) =>{
+            if (err) {
+                console.error(err);
+                return;
+            }
+            return res.user;
+        })
+    }
+    
+    public async GetAllUsers() {
+        let allUsers: User[] = [];
+        this.userClient.GetAllUsers({}, (err: any, res: any) =>{
+            console.log("users" + res.users);
+            
+            if (err) {
+                console.error(err);
+                return;
+            }
+            res.users.forEach((user: User) => {
+                allUsers.push(user);
+            })
+            return allUsers;
+        })
+    }
+
+     
+
 }
 
-export function GetUser(id: string) {
-    userClient.GetUser({id: id}, (err: any, res: any) =>{
-        if (err) {
-            console.error(err);
-            return;
-        }
-        return res.user;
-    })
-}
 
-export function GetAllUsers() {
-    const allUsers: User[] = [];
-    const getAllUsersStream = userClient.GetAllUsers({});
-    getAllUsersStream.on("data", (packet:any) => {
-        let user: User = {
-            id: packet.id ? packet.id   : "",
-            name: packet.name ? packet.name : "",
-            email: packet.email ? packet.email : "",
-            accountIds: packet.accountIds ? packet.accountIds : []
-        }
 
-        allUsers.push(user);
-    })
-    getAllUsersStream.on("end", () => {
-        console.log("All users received: "+ allUsers.length);
-        return allUsers;
-    })
-}
+
+
 
 
 

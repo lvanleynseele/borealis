@@ -4,10 +4,10 @@ import { AddAccountResponse } from '../../proto/userPackage/AddAccountResponse';
 import { AddUserResponse } from '../../proto/userPackage/AddUserResponse';
 declare class UserService {
     constructor();
-    addUser(user: User): Promise<AddUserResponse | Error | null>;
-    addAccountToUser(userId: string, account: Account): Promise<AddAccountResponse | Error | null>;
-    getUser(id: string): Promise<User | Error | null>;
-    getAllUsers(): Promise<User[] | Error | null>;
+    addUser(user: User): Promise<AddUserResponse>;
+    addAccountToUser(userId: string, account: Account): Promise<AddAccountResponse>;
+    getUser(id: string): Promise<User>;
+    getAllUsers(): Promise<User[]>;
     deleteUser(id: string): Promise<any>;
     deleteAccount(userId: string, accountId: string): Promise<void>;
 }

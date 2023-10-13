@@ -26,7 +26,7 @@ export function startUserServer() {
             console.error(err);
             return;
         }
-        console.log(`Server started on port ${PORT}`);
+        console.log(`User Server started on port ${PORT}`);
         userServer.start();
     })
 }
@@ -47,7 +47,7 @@ function getServer() {
 
             call.on("data", (packet) => {
                 userService.addUser(packet.user).then((result: any) => {
-                    users.push(packet.user);
+                    users.push(result.user);
                     call.on("end", () => {
                         callback(null, {users: users})
                     })
@@ -66,8 +66,6 @@ function getServer() {
             })
         },
         GetUser : (req, res) => {
-            console.log(req.request);
-
             userService.getUser(req.request.id!).then((user: any) => {
                 res(null, {user: user})
             }).catch((err: any) => {
@@ -79,7 +77,7 @@ function getServer() {
             let allUsers =  userService.getAllUsers().then((result: any) => {
                 let users: User[] = result;
 
-                users.forEach(u => {call.write({users: u})});
+                users.forEach(u => {call.write(u)});
                 call.end();
             }).catch((err: any) => {
                 console.log(err);

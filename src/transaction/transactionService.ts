@@ -24,7 +24,6 @@ export class TransactionService {
 
         await auroraClient.query(`INSERT INTO transactions_1 VALUES (${fromAccountId}, ${toAccountId}, ${amount})`);
 
-
         return true;
     }
 }

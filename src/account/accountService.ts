@@ -8,90 +8,42 @@ class AccountService {
     constructor() {
     }
 
-    public async addAccount(account: Account): Promise<Account|Error|null> {
-        auroraClient.query(`INSERT INTO accounts_1 VALUES ('${account.id}', '${account.name}', ${account.balance})`)
-        .then((result: any) => { 
-            return result.rows[0];
-        }).catch((err: any) => {
-            console.log('Error: ' + err);
-            return err;
-        })
-        return null;
+    public async addAccount(account: Account): Promise<Account> {
+        return await auroraClient.query(`INSERT INTO accounts_1 VALUES ('${account.id}', '${account.name}', ${account.balance})`).rows[0];
     }
 
     public async getAccount(id: string): Promise<Account|Error|null> {
-        auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${id}`).then((result: any) => {
-            return result.rows[0];
-        }).catch((err: any) => {
-            console.log(err);
-            return err;
-        })
-
-        return null;
+        return await auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${id}`).rows[0];       
     }
 
-    public async getAllAccounts(): Promise<Account[]|Error|null>  {
-        auroraClient.query('SELECT * FROM accounts_1').then((result: any) => {
-            return result.rows;
-        })
-        .catch((err: any) => {
-            console.log(err);
-            return err;
-        })
-
-        return null;
+    public async getAllAccounts()  {
+        return await auroraClient.query('SELECT * FROM accounts_1').rows;
     }
 
-    public async updateAccount(account: Account): Promise<Account|Error|null> {
-        auroraClient.query(`UPDATE accounts_1 SET name = '${account.name}', balance = ${account.balance} WHERE id = ${account.id}`)
-        .then((result: any) => {
-            return result.rows[0];
-        })
-        .catch((err: any) => {
-            console.log(err);
-            return err;
-        });
-
-        return null;
+    public async updateAccount(account: Account): Promise<Account> {
+        let updatedAccount = await auroraClient.query(`UPDATE accounts_1 SET name = '${account.name}', balance = ${account.balance} WHERE id = ${account.id}`).rows[0];
+        return{
+            id: updatedAccount.id,
+            name: updatedAccount.name,
+            balance: updatedAccount.balance,
+        } 
     }
 
     public async deleteAccount(id: string) {
-        auroraClient.query(`DELETE FROM accounts_1 WHERE id = ${id}`)
-        .then((result: any) => {
-            return true;
-        })
-        .catch((err: any) => {
-            console.log(err);
-            return false;
-        });
-
-        return false;
+        await auroraClient.query(`DELETE FROM accounts_1 WHERE id = ${id}`);
     }
 
-    public async debitRequest(id: string, amount: number): Promise<TransferResponse|Error|null> {
-        auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount} WHERE id = ${id}`)
-        .then((result: any) => {
-            return result.rows[0].balance;
-        })
-        .catch((err: any) => {
-            console.log(err);
-            return err;
-        });
+    public async debitRequest(id: string, amount: number): Promise<TransferResponse> {
+        return {
+            newBalance: await auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount} WHERE id = ${id}`).rows[0].balance,
+        }
+     }
 
-        return null;
-    }
-
-    public async creditRequest(id: string, amount: number): Promise<TransferResponse|Error|null> {
-        auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount} WHERE id = ${id}`)
-        .then((result: any) => {
-            return true;
-        })
-        .catch((err: any) => {
-            console.log(err);
-            return err;
-        });
-
-        return null;
+    public async creditRequest(id: string, amount: number): Promise<TransferResponse> {
+       return {
+        newBalance: await auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount} WHERE id = ${id}`).rows[0].balance,
+       }
+       
     }
 
 }

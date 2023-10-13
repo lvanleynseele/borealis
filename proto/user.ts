@@ -37,7 +37,6 @@ export interface ProtoGrpcType {
     DeleteUserRequest: MessageTypeDefinition
     Empty: MessageTypeDefinition
     GetAllUsersRequest: MessageTypeDefinition
-    GetAllUsersResponse: MessageTypeDefinition
     GetUserRequest: MessageTypeDefinition
     GetUserResponse: MessageTypeDefinition
     User: MessageTypeDefinition

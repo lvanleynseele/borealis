@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransactionService = void 0;
 const path = require('path');
-const auroraServer_1 = require("../../servers/auroraServer");
+const auroraServer_1 = require("../servers/auroraServer");
 class TransactionService {
     constructor() {
     }

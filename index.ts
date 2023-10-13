@@ -1,3 +1,4 @@
+import { startUserClient } from "./clients/userClient";
 import { startAccountServer } from "./src/servers/accountServer";
 import { startAuroraServer } from "./src/servers/auroraServer";
 import { startTransactionServer } from "./src/servers/transactionServer";
@@ -9,3 +10,5 @@ startUserServer();
 startTransactionServer();
 startAccountServer();
 startAuroraServer();
+
+startUserClient();

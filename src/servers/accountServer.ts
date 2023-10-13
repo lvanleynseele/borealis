@@ -49,7 +49,7 @@ function getServer() {
         },
         GetAllAccounts: (call) => {
             accounts.forEach( a => {
-                call.write(a);
+                call.write({id: a.id, name: a.name, balance: a.balance});
             })
 
             call.end();

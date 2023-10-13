@@ -29,7 +29,7 @@ service UserService {
       get: "/v1/users/{id}"
     };
   };
-  rpc GetAllUsers(Empty) returns (stream GetAllUsersResponse){
+  rpc GetAllUsers(Empty) returns (stream User){
     option (google.api.http) = {
       get: "/v1/users"
     };
@@ -100,8 +100,4 @@ message AddAccountResponse {
 
 message GetUserResponse {
   User user = 1;
-}
-
-message GetAllUsersResponse {
-  User users = 1;
 }

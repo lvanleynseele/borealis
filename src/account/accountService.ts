@@ -9,23 +9,26 @@ class AccountService {
     }
 
     public async addAccount(account: Account): Promise<Account> {
-        return await auroraClient.query(`INSERT INTO accounts_1 VALUES ('${account.id}', '${account.name}', ${account.balance})`).rows[0];
+        const response = await auroraClient.query(`INSERT INTO accounts_1 VALUES ('${account.id}', '${account.name}', ${account.balance})`);
+        return response.rows[0];
     }
 
-    public async getAccount(id: string): Promise<Account|Error|null> {
-        return await auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${id}`).rows[0];       
+    public async getAccount(id: string): Promise<Account> {
+        const response = await auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${id}`);  
+        return {
+            ...response.rows[0]
+        }     
     }
 
     public async getAllAccounts()  {
-        return await auroraClient.query('SELECT * FROM accounts_1').rows;
+        const response = await auroraClient.query('SELECT * FROM accounts_1');
+        return response.rows;
     }
 
     public async updateAccount(account: Account): Promise<Account> {
         let updatedAccount = await auroraClient.query(`UPDATE accounts_1 SET name = '${account.name}', balance = ${account.balance} WHERE id = ${account.id}`).rows[0];
         return{
-            id: updatedAccount.id,
-            name: updatedAccount.name,
-            balance: updatedAccount.balance,
+            ...updatedAccount
         } 
     }
 
@@ -34,15 +37,15 @@ class AccountService {
     }
 
     public async debitRequest(id: string, amount: number): Promise<TransferResponse> {
-        return {
-            newBalance: await auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount} WHERE id = ${id}`).rows[0].balance,
-        }
+        const response = await auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount} WHERE id = ${id}`)
+       
+        return { newBalance: response.rows[0].balance }
      }
 
     public async creditRequest(id: string, amount: number): Promise<TransferResponse> {
-       return {
-        newBalance: await auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount} WHERE id = ${id}`).rows[0].balance,
-       }
+        const response = await auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount} WHERE id = ${id}`)
+       
+        return { newBalance: response.rows[0].balance }
        
     }
 

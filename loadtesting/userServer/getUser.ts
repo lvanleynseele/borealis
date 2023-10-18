@@ -1,7 +1,9 @@
 const path = require("path");
-import { User } from '../../proto/userPackage/User'
 import { userClient } from '../../clients/userClient';
-import { get } from 'http';
+import { expose } from "threads"
+import { User } from '../../proto/userPackage/User';
+
+
 
 
 let allUsers: User[] = [];
@@ -9,49 +11,67 @@ let allUsers: User[] = [];
 function getRandomUser() {
     if(allUsers.length > 0) {
         let randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
-        return randomUser.id;
+        return randomUser.id!;
     }
     return 'a819c3db-d71a-47a0-b5d6-013abc89d861';
 }
 
-
-async function getUserLoadTest() {
-
-
-    userClient.GetAllUsers({}, (err: any, res: any) => {
-        if (err) {
-            console.error(err);
-        }
-        res.users.forEach((user: User) => {
-            allUsers.push(user);
+async function loadAllUsers() {
+    allUsers = await new Promise((resolve, reject) => {
+        userClient.GetAllUsers({}, (err: any, res: any) => {
+            if (err) {
+                console.error(err);
+                reject(err);
+            }
+    
+            resolve(res.users);
         })
-
-        const startTime = process.hrtime();
-
-        const callTimes: number[] = [];
-        for(let i = 0; i < 50; i++){
-            let id = getRandomUser();
-            const callStartTime = process.hrtime();
-            
-            userClient.GetUser({id: id}, (err: any, res: any) => {
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                // console.log(res.user);   
-                
-            });
-
-            const callEndTime = process.hrtime(callStartTime);
-            callTimes.push(callEndTime[0] + callEndTime[1]);
-        }
-        const endTime = process.hrtime(startTime);
-        console.log(`Execution time: ${endTime[0]}s ${endTime[1] / 1000000}ms`);
-        let avgCallTime = callTimes.reduce((a, b) => a + b) / callTimes.length;
-        console.log(`Average call time: ${avgCallTime / 1000000}ms`);   
-    })
-     
+    });
 }
 
-getUserLoadTest();
+async function runGetUsers(numRequests: number, worker: number ){
+    await loadAllUsers();
+    
+    let runtimes: number[] = [];
+    let errors = 0;
+
+    console.log("Worker " + worker + " Running " + numRequests + " requests");
+
+    for(let i = 0; i < numRequests; i++) {
+        let startTime = process.hrtime();
+        let user = await getUser(getRandomUser()).catch((err) => {
+            console.log(err.StatusObject.code);
+            errors++;
+        });
+        let endTime = process.hrtime(startTime);
+
+        runtimes.push(endTime[0] * 1000000 + endTime[1]);
+        // console.log(`Execution time: ${endTime[0]}s ${endTime[1] / 1000000}ms`);
+    }
+
+    
+
+    console.log("Average runtime: " + runtimes.reduce((a, b) => a + b, 0) / runtimes.length);    
+    console.log("Errors: " + errors);
+
+}
+
+
+async function getUser(id: string): Promise<User> {
+    return new Promise((resolve, reject) => {
+        userClient.GetUser({id: id}, (err: any, res: any) => {
+            if (err){
+                // console.error(err);
+                reject(err);
+            }
+            else {
+                (resolve(res.user));
+            }
+        });
+    });
+}
+
+expose(runGetUsers);
+
+
 

@@ -53,10 +53,14 @@ export interface UserServiceClient extends grpc.Client {
     deleteUser(argument: _userPackage_DeleteUserRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_Empty__Output>): grpc.ClientUnaryCall;
     deleteUser(argument: _userPackage_DeleteUserRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_Empty__Output>): grpc.ClientUnaryCall;
     deleteUser(argument: _userPackage_DeleteUserRequest, callback: grpc.requestCallback<_userPackage_Empty__Output>): grpc.ClientUnaryCall;
-    GetAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, options?: grpc.CallOptions): grpc.ClientReadableStream<_userPackage_GetAllUsersResponse__Output>;
-    GetAllUsers(argument: _userPackage_Empty, options?: grpc.CallOptions): grpc.ClientReadableStream<_userPackage_GetAllUsersResponse__Output>;
-    getAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, options?: grpc.CallOptions): grpc.ClientReadableStream<_userPackage_GetAllUsersResponse__Output>;
-    getAllUsers(argument: _userPackage_Empty, options?: grpc.CallOptions): grpc.ClientReadableStream<_userPackage_GetAllUsersResponse__Output>;
+    GetAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    GetAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    GetAllUsers(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    GetAllUsers(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    getAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    getAllUsers(argument: _userPackage_Empty, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    getAllUsers(argument: _userPackage_Empty, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
+    getAllUsers(argument: _userPackage_Empty, callback: grpc.requestCallback<_userPackage_GetAllUsersResponse__Output>): grpc.ClientUnaryCall;
     GetUser(argument: _userPackage_GetUserRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetUserResponse__Output>): grpc.ClientUnaryCall;
     GetUser(argument: _userPackage_GetUserRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_userPackage_GetUserResponse__Output>): grpc.ClientUnaryCall;
     GetUser(argument: _userPackage_GetUserRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_userPackage_GetUserResponse__Output>): grpc.ClientUnaryCall;
@@ -72,7 +76,7 @@ export interface UserServiceHandlers extends grpc.UntypedServiceImplementation {
     AddUser: grpc.handleUnaryCall<_userPackage_AddUserRequest__Output, _userPackage_AddUserResponse>;
     DeleteAccount: grpc.handleUnaryCall<_userPackage_DeleteAccountRequest__Output, _userPackage_Empty>;
     DeleteUser: grpc.handleUnaryCall<_userPackage_DeleteUserRequest__Output, _userPackage_Empty>;
-    GetAllUsers: grpc.handleServerStreamingCall<_userPackage_Empty__Output, _userPackage_GetAllUsersResponse>;
+    GetAllUsers: grpc.handleUnaryCall<_userPackage_Empty__Output, _userPackage_GetAllUsersResponse>;
     GetUser: grpc.handleUnaryCall<_userPackage_GetUserRequest__Output, _userPackage_GetUserResponse>;
 }
 export interface UserServiceDefinition extends grpc.ServiceDefinition {

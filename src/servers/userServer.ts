@@ -18,20 +18,20 @@ const userPackage = grpcObject.userPackage;
 export const userServer = getServer()
 
 
-export function startUserServer() {
-    
-    userServer.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(),
-    (err, port) => {
+export async function startUserServer() {
+    const server = await getServer();
+    server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(),
+    (err: any, port: any ) => {
         if(err){
             console.error(err);
             return;
         }
         console.log(`User Server started on port ${PORT}`);
-        userServer.start();
+        server.start();
     })
 }
 
-function getServer() {
+async function getServer() {
     const server = new grpc.Server();
     server.addService(userPackage.UserService.service, {
         AddUser : (req, res) => {
@@ -52,57 +52,44 @@ function getServer() {
                         callback(null, {users: users})
                     })
                 }).catch((err: any) => {
-                    call.on("end", () => {
+                    call.on("error", () => {
                         callback(err, null)
                     })
                 })
             })    
         },
-        AddAccount : (req, res) => { 
+        AddAccount : async (req, res) => { 
             userService.addAccountToUser(req.request.userId!, req.request.account!).then((result: any) => {
                 res(null, { userId: req.request.userId, account: req.request.account})
             }).catch((err: any) => {
                 res(err, null)
             })
         },
-        GetUser : (req, res) => {
+        GetUser : async (req, res) => {
             userService.getUser(req.request.id!).then((user: any) => {
                 res(null, {user: user})
             }).catch((err: any) => {
                 console.log(err)
-                res(null, null)
-            })
-        },
-        // GetAllUsers : (call) => {
-        //     console.log("GetAllUsers called");
-
-        //     let allUsers =  userService.getAllUsers().then((result: any) => {
-        //         let users: User[] = result;
-        //         users.forEach(u => {call.write(u)});
-        //         call.end();
-        //     }).catch((err: any) => {
-        //         console.log(err);
-        //         call.write(err);
-        //         call.end();
-        //     })  
-        // },
-        GetAllUsers : (req, res) => {
-            userService.getAllUsers().then((result: any) => {
-                let users: User[] = result;
-                res(null, {users: users})
-            }).catch((err: any) => {
-                console.log(err);
                 res(err, null)
             })
         },
-        // UpdateUser : (req, res) => {
-        //     userService.updateUser(req.request.user).then((result: any) => {
-        //         res(null, {user: req.request.user})
-        //     }).catch((err: any) => {
-        //         console.log(err)
-        //         res(err, null)
-        //     })
-        // },
+        GetAllUsers : async (req, res) => {
+            // await userService.getAllUsers().then((result: any) => {
+            //     let users: User[] = result;
+            //     res(null, {users: users})
+            // }).catch((err: any) => {
+            //     console.log(err);
+            //     res(err, null)
+            // })
+            try {
+                let users: User[] = await userService.getAllUsers();
+                res(null, {users: users})                
+            } catch (error) {
+                console.log(error);
+                res(error as grpc.StatusObject, null)
+            }
+
+        },
         DeleteUser : (req, res) => {
             userService.deleteUser(req.request.id!).then((result: any) => {
                 res(null, null)

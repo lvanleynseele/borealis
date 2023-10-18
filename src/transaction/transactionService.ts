@@ -23,7 +23,7 @@ export class TransactionService {
         await auroraClient.query(`UPDATE accounts_1 SET balance = ${toAccountBalance} WHERE id = ${toAccountId}`);
 
         await auroraClient.query(`INSERT INTO transactions_1 VALUES (${fromAccountId}, ${toAccountId}, ${amount})`);
-
+        
         return true;
     }
 }

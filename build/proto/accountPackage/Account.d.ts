@@ -9,4 +9,3 @@ export interface Account__Output {
     'name'?: (string);
     'balance'?: (Long);
 }
-export declare function isAccount(account: any): account is Account;

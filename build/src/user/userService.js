@@ -9,9 +9,8 @@ class UserService {
     }
     async addUser(user) {
         var _a;
-        return {
-            user: await auroraServer_1.auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${(_a = user.accountIds) === null || _a === void 0 ? void 0 : _a.toString()}}')`).rows[0]
-        };
+        await auroraServer_1.auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${(_a = user.accountIds) === null || _a === void 0 ? void 0 : _a.toString()}}')`);
+        return { user: user };
     }
     async addAccountToUser(userId, account) {
         await accountService_1.accountService.addAccount(account);
@@ -29,10 +28,11 @@ class UserService {
     }
     //return rows and update server to convert to user objects
     async getAllUsers() {
-        return await auroraServer_1.auroraClient.query('SELECT * FROM users_2').rows;
+        let allUsers = await auroraServer_1.auroraClient.query('SELECT * FROM users_2');
+        return allUsers.rows;
     }
     async deleteUser(id) {
-        return await auroraServer_1.auroraClient.query(`DELETE FROM users_2 WHERE id = '${id}'`);
+        await auroraServer_1.auroraClient.query(`DELETE FROM users_2 WHERE id = '${id}'`);
     }
     async deleteAccount(userId, accountId) {
         await auroraServer_1.auroraClient.query(`DELETE FROM accounts_1 WHERE id = ${accountId}`);

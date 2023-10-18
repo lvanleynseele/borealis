@@ -4,8 +4,6 @@ import * as protoLoader from "@grpc/proto-loader";
 import { ProtoGrpcType } from "../proto/user";
 import { User } from "../proto/userPackage/User";
 import { UserServiceClient } from "../proto/userPackage/UserService";
-import { get } from "http";
-
 const PORT = 8082; //process.env.PORT || 8082;
 const PROTO_FILE = '../proto/user.proto';
 
@@ -33,7 +31,7 @@ function onClientReady() {
 
 
 export class UserClient {
-    public userClient: UserServiceClient =  new grpcObject.userPackage.UserService (
+    public client: UserServiceClient =  new grpcObject.userPackage.UserService (
         `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
     );
 
@@ -42,7 +40,7 @@ export class UserClient {
     }
 
     private startUserClient() {
-        this.userClient.waitForReady(Infinity, (err) => {
+        this.client.waitForReady(Infinity, (err) => {
             if (err){
                 console.error(err);
                 return;
@@ -56,7 +54,7 @@ export class UserClient {
     }
 
     public async  AddUser(user: User) {
-        this.userClient.AddUser({user: user}, (err: any, res: any) =>{
+        this.client.AddUser({user: user}, (err: any, res: any) =>{
             if (err) {
                 console.error(err);
                 return;
@@ -65,20 +63,37 @@ export class UserClient {
         })
     }
 
-    public async GetUser(id: string) {
+    public async GetUser(id: string): Promise<User> {
         console.log("Getting user with id: " + id);
-        this.userClient.GetUser({id: id}, (err: any, res: any) =>{
+        let user: User|undefined = undefined;
+        let response = await this.client.GetUser({id: id}, (err: any, res: any) =>{
             if (err) {
                 console.error(err);
                 return;
             }
-            return res.user;
+            user = res.user;
         })
+
+        response.on('data', (packet: any) => {
+            user = packet.user;
+        })
+        
+        if(user == undefined){
+            return {
+                id: "",
+                name: "",
+                email: "",
+                accountIds: []
+            }
+        }
+        else {
+            return user;
+        }
     }
     
     public async GetAllUsers() {
         let allUsers: User[] = [];
-        this.userClient.GetAllUsers({}, (err: any, res: any) =>{
+        let call = await this.client.GetAllUsers({}, (err: any, res: any) =>{
             console.log("users" + res.users);
             
             if (err) {
@@ -90,57 +105,13 @@ export class UserClient {
             })
             return allUsers;
         })
+
+        let response = await call.on('metadata', (metadata: any) => {
+                console.log(metadata);
+                let temp = metadata.get('users');
+            })
+
+
+        return allUsers;
     }
-
-     
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function onClientReady() {
-//     let expUser = {id:  "1234567890", name: "Liam", email: "lvanl@abc.com"} //take in from cli in future
-
-    // userClient.AddUser({user: expUser}, (err, res) =>{
-    //     if (err) {
-    //         console.error(err);
-    //         return;
-    //     }
-    //     //console.log(res);
-
-    // })
-// 
-//     const stream = userClient.AddMultipleUsers((err, res) => {
-//         if (err) {
-//             console.error(err);
-//             return;
-//         }
-//         //console.log(res);
-//     })
-
-//     stream.write({users: {id: "1827485940", name: "Marvin", email: "marvin@abc.com"}})
-//     stream.write({users: {id: "2327485940", name: "Moira", email: "moira@abc.com"}})
-//     stream.write({users: {id: "8390485940", name: "Sid", email: "sid@abc.com"}})
-
-//     stream.end();
-
-
-    // const getAllUsersStream = userClient.GetAllUsers({})
-    // getAllUsersStream.on("data", (packet) => {
-    //     console.log(packet);
-    // })
-    // getAllUsersStream.on("end", () => {
-        
-    // })
-
-// }

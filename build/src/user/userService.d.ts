@@ -8,7 +8,7 @@ declare class UserService {
     addAccountToUser(userId: string, account: Account): Promise<AddAccountResponse>;
     getUser(id: string): Promise<User>;
     getAllUsers(): Promise<User[]>;
-    deleteUser(id: string): Promise<any>;
+    deleteUser(id: string): Promise<void>;
     deleteAccount(userId: string, accountId: string): Promise<void>;
 }
 export declare const userService: UserService;

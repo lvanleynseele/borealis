@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserClient = exports.startUserClient = exports.userClient = void 0;
+exports.startUserClient = exports.userClient = void 0;
 const path = require("path");
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
@@ -22,75 +22,77 @@ exports.startUserClient = startUserClient;
 function onClientReady() {
     console.log('User Client ready');
 }
-class UserClient {
-    constructor() {
-        this.client = new grpcObject.userPackage.UserService(`0.0.0.0:${PORT}`, grpc.credentials.createInsecure());
-        this.startUserClient();
-    }
-    startUserClient() {
-        this.client.waitForReady(Infinity, (err) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            this.onClientReady();
-        });
-    }
-    onClientReady() {
-        console.log('User Client ready');
-    }
-    async AddUser(user) {
-        this.client.AddUser({ user: user }, (err, res) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            console.log(res);
-        });
-    }
-    async GetUser(id) {
-        console.log("Getting user with id: " + id);
-        let user = undefined;
-        let response = await this.client.GetUser({ id: id }, (err, res) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            user = res.user;
-        });
-        response.on('data', (packet) => {
-            user = packet.user;
-        });
-        if (user == undefined) {
-            return {
-                id: "",
-                name: "",
-                email: "",
-                accountIds: []
-            };
-        }
-        else {
-            return user;
-        }
-    }
-    async GetAllUsers() {
-        let allUsers = [];
-        let response = await this.client.GetAllUsers({}, (err, res) => {
-            console.log("users" + res.users);
-            if (err) {
-                console.error(err);
-                return;
-            }
-            res.users.forEach((user) => {
-                allUsers.push(user);
-            });
-            return allUsers;
-        });
-        response.on('end', () => {
-            return allUsers;
-        });
-        return allUsers;
-    }
-}
-exports.UserClient = UserClient;
+// export class UserClient {
+//     public client: UserServiceClient =  new grpcObject.userPackage.UserService (
+//         `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
+//     );
+//     constructor() {
+//         this.startUserClient();
+//     }
+//     private startUserClient() {
+//         this.client.waitForReady(Infinity, (err) => {
+//             if (err){
+//                 console.error(err);
+//                 return;
+//             }
+//             this.onClientReady()
+//         }) 
+//     }
+//     private onClientReady() {
+//         console.log('User Client ready');
+//     }
+//     public async  AddUser(user: User) {
+//         this.client.AddUser({user: user}, (err: any, res: any) =>{
+//             if (err) {
+//                 console.error(err);
+//                 return;
+//             }
+//             console.log(res);
+//         })
+//     }
+//     public async GetUser(id: string): Promise<User> {
+//         console.log("Getting user with id: " + id);
+//         let user: User|undefined = undefined;
+//         let response = await this.client.GetUser({id: id}, (err: any, res: any) =>{
+//             if (err) {
+//                 console.error(err);
+//                 return;
+//             }
+//             user = res.user;
+//         })
+//         response.on('data', (packet: any) => {
+//             user = packet.user;
+//         })
+//         if(user == undefined){
+//             return {
+//                 id: "",
+//                 name: "",
+//                 email: "",
+//                 accountIds: []
+//             }
+//         }
+//         else {
+//             return user;
+//         }
+//     }
+//     public async GetAllUsers() {
+//         let allUsers: User[] = [];
+//         let call = await this.client.GetAllUsers({}, (err: any, res: any) =>{
+//             console.log("users" + res.users);
+//             if (err) {
+//                 console.error(err);
+//                 return;
+//             }
+//             res.users.forEach((user: User) => {
+//                 allUsers.push(user);
+//             })
+//             return allUsers;
+//         })
+//         let response = await call.on('metadata', (metadata: any) => {
+//                 console.log(metadata);
+//                 let temp = metadata.get('users');
+//             })
+//         return allUsers;
+//     }
+// }
 //# sourceMappingURL=userClient.js.map

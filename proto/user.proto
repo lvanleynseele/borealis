@@ -6,7 +6,7 @@ syntax = "proto3";
 package userPackage;
 
 service UserService {
-  rpc AddUser (AddUserRequest) returns (AddUserResponse){
+  rpc AddUser (AddUserRequest) returns (Empty){
     option (google.api.http) = {
       post: "/v1/users"
       body: "*"
@@ -18,7 +18,7 @@ service UserService {
       body: "*"
     };
   };
-  rpc AddAccount(AddAccountRequest) returns (AddAccountResponse){
+  rpc AddAccount(AddAccountRequest) returns (Empty){
     option (google.api.http) = {
       post: "/v1/users/{userId}/accounts"
       body: "*"

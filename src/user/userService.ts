@@ -12,14 +12,22 @@ class UserService {
     }
 
     public async addUser(user: User): Promise<AddUserResponse> {
-        await auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${user.accountIds?.toString()}}')`);
+
+        if(user.accountIds == undefined) {
+
+            await auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{}')`);
+        }
+        else {
+            await auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${user.accountIds?.toString()}}')`);
+        }
+        
     
         return { user : user }
     }
 
-    public async addAccountToUser(userId: string, account: Account): Promise<AddAccountResponse> {
-        await accountService.addAccount(account);
-        await auroraClient.query(`UPDATE users_2 SET accountIds = array_append(accountIds, '${account.id}') WHERE id = ${userId}`)
+    public async addAccount(userId: string, account: Account): Promise<AddAccountResponse> {
+        // await accountService.addAccount(account);
+        await auroraClient.query(`UPDATE users_2 SET account_ids = array_append(account_ids, '${account.id}') WHERE id = '${userId}'`)
 
         return {userId: userId, account: account};
 

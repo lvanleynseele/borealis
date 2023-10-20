@@ -1,4 +1,6 @@
+import { Long } from '@grpc/proto-loader';
 export declare class TransactionService {
     constructor();
-    transferMoney(fromAccountId: string, toAccountId: string, amount: number): Promise<boolean>;
+    transactionRequest(senderId: string, receiverId: string, amount: Long): Promise<boolean>;
 }
+export declare const transactionService: TransactionService;

@@ -1,24 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionService = void 0;
+exports.transactionService = exports.TransactionService = void 0;
 const path = require('path');
+const accountService_1 = require("../account/accountService");
+const uuid_1 = require("uuid");
 const auroraServer_1 = require("../servers/auroraServer");
 class TransactionService {
     constructor() {
     }
-    async transferMoney(fromAccountId, toAccountId, amount) {
-        const fromAccount = await auroraServer_1.auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${fromAccountId}`);
-        const toAccount = await auroraServer_1.auroraClient.query(`SELECT * FROM accounts_1 WHERE id = ${toAccountId}`);
-        if (fromAccount.rows[0].balance < amount) {
+    async transactionRequest(senderId, receiverId, amount) {
+        const sender = await accountService_1.accountService.getAccount(senderId);
+        if (sender.balance < amount) {
             return false;
         }
-        const fromAccountBalance = fromAccount.rows[0].balance - amount;
-        const toAccountBalance = toAccount.rows[0].balance + amount;
-        await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = ${fromAccountBalance} WHERE id = ${fromAccountId}`);
-        await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = ${toAccountBalance} WHERE id = ${toAccountId}`);
-        await auroraServer_1.auroraClient.query(`INSERT INTO transactions_1 VALUES (${fromAccountId}, ${toAccountId}, ${amount})`);
-        return true;
+        accountService_1.accountService.debitRequest(senderId, amount).then((result) => {
+            accountService_1.accountService.creditRequest(receiverId, amount).then((result) => {
+                return true;
+            }).catch((err) => {
+                accountService_1.accountService.creditRequest(senderId, amount).finally(() => { });
+                return false;
+            });
+        }).catch((err) => {
+            console.log(err);
+            return false;
+        });
+        let transactionId = (0, uuid_1.v4)().toString();
+        await auroraServer_1.auroraClient.query(`INSERT INTO transactions_1 VALUES ('${senderId}', '${receiverId}', ${amount.low}, '${transactionId}')`);
+        return false;
     }
 }
 exports.TransactionService = TransactionService;
+exports.transactionService = new TransactionService();
 //# sourceMappingURL=transactionService.js.map

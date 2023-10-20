@@ -5,7 +5,7 @@ syntax = "proto3";
 package accountPackage;
 
 service AccountService {
-  rpc AddAccount (Account) returns (Account){
+  rpc AddAccount (Account) returns (Empty){
     option (google.api.http) = {
       post: "/v1/accounts"
       body: "*"
@@ -21,7 +21,7 @@ service AccountService {
       get: "/v1/accounts"
     };
   };
-  rpc UpdateAccount (UpdateAccountRequest) returns (Account){
+  rpc UpdateAccount (UpdateAccountRequest) returns (Empty){
     option (google.api.http) = {
       put: "/v1/accounts/{id}"
       body: "*"
@@ -32,13 +32,13 @@ service AccountService {
       delete: "/v1/accounts/{id}"
     };
   };
-  rpc DebitRequest (DebitRequest) returns (TransferResponse){
+  rpc DebitRequest (DebitRequest) returns (Empty){
     option (google.api.http) = {
       post: "/v1/accounts/{id}/debit"
       body: "*"
     };
   };
-  rpc CreditRequest (CreditRequest) returns (TransferResponse){
+  rpc CreditRequest (CreditRequest) returns (Empty){
     option (google.api.http) = {
       post: "/v1/accounts/{id}/credit"
       body: "*"
@@ -80,4 +80,8 @@ message CreditRequest {
 message TransferResponse {
   int64 newBalance = 1;
 }
+
+// message GetAllAccountsResponse {
+//   repeated Account accounts = 1;
+// }
 

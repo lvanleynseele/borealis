@@ -41,6 +41,7 @@
     "accountClient": "ts-node accountClient.ts",
     "transactionClient": "ts-node transactionClient.ts",
     "userClient": "ts-node clients/userClient.ts",
-    "load:user": "ts-node ./loadtesting/userServer/userLoadTests.ts"
+    "load:user": "ts-node ./loadtesting/userServer/userLoadTests.ts",
+    "load:transaction": "ts-node ./loadtesting/transactionServer/transactionLoadTests.ts"
   }
 }

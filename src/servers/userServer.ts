@@ -6,6 +6,7 @@ import { ProtoGrpcType } from "../../proto/user"
 import { UserServiceHandlers } from '../../proto/userPackage/UserService'
 import { User } from "../../proto/userPackage/User";
 import { userService } from "../user/userService";
+import { accountService } from "../account/accountService";
 
 
 const PORT = 8082; //process.env.PORT || 8082;
@@ -34,15 +35,14 @@ export async function startUserServer() {
 async function getServer() {
     const server = new grpc.Server();
     server.addService(userPackage.UserService.service, {
-        AddUser : (req, res) => {
-            console.log(req.request)
+        AddUser : async (req, res) => {
             userService.addUser(req.request.user!).then((result: any) => {
                 res(null, { user: req.request.user})
             }).catch((err: any) => { 
                 res(err, null)
             });
         },
-        AddMultipleUsers : (call, callback) => {
+        AddMultipleUsers : async (call, callback) => {
             const users: User[] = []
 
             call.on("data", (packet) => {
@@ -59,11 +59,15 @@ async function getServer() {
             })    
         },
         AddAccount : async (req, res) => { 
-            userService.addAccountToUser(req.request.userId!, req.request.account!).then((result: any) => {
-                res(null, { userId: req.request.userId, account: req.request.account})
+            accountService.addAccount(req.request.account!).then((result: any) => {
+                userService.addAccount(req.request.userId!, req.request.account!).then((result: any) => {
+                    res(null, { userId: req.request.userId, account: req.request.account})
+                }).catch((err: any) => {
+                    res(err, null)
+                })
             }).catch((err: any) => {
                 res(err, null)
-            })
+            });
         },
         GetUser : async (req, res) => {
             userService.getUser(req.request.id!).then((user: any) => {
@@ -90,7 +94,7 @@ async function getServer() {
             }
 
         },
-        DeleteUser : (req, res) => {
+        DeleteUser : async (req, res) => {
             userService.deleteUser(req.request.id!).then((result: any) => {
                 res(null, null)
             }).catch((err: any) => {
@@ -98,7 +102,7 @@ async function getServer() {
                 res(err, null)
             })
         },
-        DeleteAccount : (req, res) => {
+        DeleteAccount : async (req, res) => {
             userService.deleteAccount(req.request.userId!, req.request.accountId!).then((result: any) => {
                 res(null, null)
             }).catch((err: any) => {

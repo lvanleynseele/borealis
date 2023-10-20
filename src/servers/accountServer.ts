@@ -5,6 +5,8 @@ import { ProtoGrpcType } from "../../proto/account"
 import { AccountServiceHandlers } from '../../proto/accountPackage/AccountService'
 import { Account } from "../../proto/accountPackage/Account";
 import { error } from "console";
+import { accountService } from "../account/accountService";
+import { account } from "../..";
 
 const PORT = 8083; //process.env.PORT || 8082;
 const PROTO_FILE = '../../proto/account.proto';
@@ -32,76 +34,60 @@ export function startAccountServer() {
 function getServer() {
     const server = new grpc.Server();
     server.addService(accountPackage.AccountService.service, {
-        AddAccount: (req, res) => {
-            accounts.push(req.request);
-            res(null, req.request);
-        },
-        GetAccount: (req, res) => {
-            const accountFound = accounts.find(a => a.id == req.request.id);
-
-            if (accountFound){
-                res(null, accountFound)
-            }
-            else{
-                const accountNotFoundError = error(`Could not find account with id ${req.request}`)
-                res(null, null)
-            }
-        },
-        GetAllAccounts: (call) => {
-            accounts.forEach( a => {
-                call.write({id: a.id, name: a.name, balance: a.balance});
+        AddAccount: async (req, res) => {
+            accountService.addAccount(req.request).then((result: any) => {
+                res(null, null);
+            }).catch((err: any) => {
+                res(err, null);
             })
-
-            call.end();
         },
-        UpdateAccount: (req, res) => {
-            let accountToUpdate = accounts.find(a => a.id == req.request.updatedAccount?.id);
-            
-            if(accountToUpdate) {
-                accountToUpdate = req.request.updatedAccount;
-                res(null, req.request.updatedAccount);
-            }
-            else{
-                console.log(`COuld not find account with id ${req.request.updatedAccount?.id}`)
-            }
+        GetAccount: async (req, res) => {
+            accountService.getAccount(req.request.id!).then((result: any) => {
+                res(null, result.account);
+            }).catch((err: any) => {
+                res(err, null);
+            });
         },
-        DeleteAccount: (req, res) => {
-            accounts = accounts.filter(a => a.id != req.request.id)
-
-            console.log(`account with id ${req.request.id} deleted`)
-            res(null, null)
+        GetAllAccounts: async (call) => {
+            accountService.getAllAccounts().then((result: any) => {
+                console.log("get all accounts")
+                
+                result.forEach((account: any) => {
+                    call.write({...account})
+                })
+                call.end();
+            }).catch((err: any) => {
+                call.emit("error", err);
+                call.end();
+            });
+        },
+        UpdateAccount: async (req, res) => {
+            accountService.updateAccount(req.request.updatedAccount!).then((result: any) => {
+                res(null, null);
+            }).catch((err: any) => {
+                res(err, null);
+            });
+        },
+        DeleteAccount: async (req, res) => {
+            accountService.deleteAccount(req.request.id!).then((result: any) => {
+                res(null, null);
+            }).catch((err: any) => {
+                res(err, null);
+            });
         },
         DebitRequest: (req, res) => {
-            // let account =  accounts.find(a => a.id == req.request.id);
-
-            // if(account){
-            //     account.balance? -= req.request.amount? ;
-            //     res(null, { newBalance: account.balance})
-            // }
-            // else {
-            //     console.log(`could not find account with id ${req.request.id}`);
-            //     res(null, null);
-            // }
+            accountService.debitRequest(req.request.id!, req.request.amount!).then((result: any) => {
+                res(null, null);
+            }).catch((err: any) => {    
+                res(err, null);
+            });
         },
         CreditRequest: (req, res) => {
-            let account =  accounts.find(a => a.id == req.request.id);
-            const credit = req.request.amount?.low!
-            
-
-            if(account && account.balance != null){
-
-                console.log(`account balance: ${account.balance}`)
-                console.log(`credit: ${credit}`)
+            accountService.creditRequest(req.request.id!, req.request.amount!).then((result: any) => {
                 res(null, null);
-
-                // const balance = account.balance ? account.balance : 0
-                // account.balance = balance + credit
-                // res(null, { newBalance: account.balance})
-            }
-            else {
-                console.log(`could not find account with id ${req.request.id}`);
-                res(null, null);
-            }
+            }).catch((err: any) => {
+                res(err, null);
+            });
         }
     } as AccountServiceHandlers)
     return server;

@@ -5,7 +5,7 @@ import { AddUserResponse } from '../../proto/userPackage/AddUserResponse';
 declare class UserService {
     constructor();
     addUser(user: User): Promise<AddUserResponse>;
-    addAccountToUser(userId: string, account: Account): Promise<AddAccountResponse>;
+    addAccount(userId: string, account: Account): Promise<AddAccountResponse>;
     getUser(id: string): Promise<User>;
     getAllUsers(): Promise<User[]>;
     deleteUser(id: string): Promise<void>;

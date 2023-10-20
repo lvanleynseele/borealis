@@ -2,21 +2,9 @@ const path = require("path");
 import { User } from '../../proto/userPackage/User'
 import { faker } from '@faker-js/faker';
 import {v4 as uuid} from 'uuid';
-import * as grpc from "@grpc/grpc-js";
-import { ProtoGrpcType } from "../../proto/user";
-const protoLoader = require('@grpc/proto-loader');
-const autocannon = require('autocannon');
-// const userClient = require('../../clients/userClient');
-
-const PORT = 8082; //process.env.PORT || 8082;
-const PROTO_FILE = '../../proto/user.proto';
-
-const packageDef = protoLoader.loadSync(path.resolve(__dirname, PROTO_FILE));
-const userPackage = grpc.loadPackageDefinition(packageDef) as unknown as ProtoGrpcType;
-// const client = new userPackage.userPackage.UserService('localhost:8082', grpc.credentials.createInsecure());
-const client = new userPackage.userPackage.UserService (
-    `0.0.0.0:${PORT}`, grpc.credentials.createInsecure()
-)
+import { Account } from '../../proto/accountPackage/Account';
+import { userClient } from '../../clients/userClient';('../../clients/userClient');
+import { expose } from "threads";
 
 function generateRandomUser(): User {
     let person = faker.person;
@@ -24,26 +12,90 @@ function generateRandomUser(): User {
     return {
         "id": uuid().toString(),
         "name": person.fullName(),
-        "email": faker.internet.email(person.firstName(), person.lastName()),
+        "email": faker.internet.email({firstName: person.firstName(), lastName: person.lastName()}),
+        
     }
 }
 
+function generateRandomAccount(): Account[] {
 
-// const instance = autocannon({
-//     url: 'grpc://localhost:8082',
-//     connections: 10, // number of concurrent connections
-//     pipelining: 1, // number of pipelined requests
-//     duration: 10, // test duration in seconds
-//     setupClient: () => {client},
-//     requests: [
-//         client.AddUser({user: generateRandomUser()}, (err: any, res: any) =>{
-//             if (err) {
-//                 console.error(err);
-//                 return;
-//             }
-//             console.log(res);
-//         })
-//     ]
-// }, console.log);
+    let numAccounts = Math.floor(Math.random() * 5) + 1;
+    let accounts: Account[] = [];
 
-// autocannon.track(instance, {renderProgressBar: true});
+    for(let i = 0; i < numAccounts; i++) {
+        accounts.push({
+            "id": uuid().toString(),
+            "name": faker.company.name(),
+            "balance": faker.finance.amount(),
+        });
+    }
+
+    return accounts;
+}
+
+
+async function runAddUsers(NUM_REQUESTS: number, worker: number) {
+
+    let runtimes: number[] = [];
+    let errors = 0;
+
+    console.log("Worker " + worker + " Running " + NUM_REQUESTS + " requests");
+
+    for(let i = 0; i < NUM_REQUESTS; i++) {
+        let user = generateRandomUser();
+        let accounts = generateRandomAccount();
+        
+        let startTime = process.hrtime();
+        
+        await addUser(user).catch((err) => {
+            console.log(err);
+            errors++;
+        });
+
+
+        await addAccounts(accounts, user.id!).catch((err) => {
+            console.log(err);
+            errors++;
+        });
+
+
+        let endTime = process.hrtime(startTime);
+
+        runtimes.push(endTime[0] * 1000000 + endTime[1]);
+        // console.log(`Execution time: ${endTime[0]}s ${endTime[1] / 1000000}ms`);
+    }
+
+    console.log("Average runtime: " + runtimes.reduce((a, b) => a + b, 0) / runtimes.length);    
+    console.log("Errors: " + errors);
+}
+
+
+async function addUser(user: User) {
+    return new Promise((resolve, reject) => {
+        userClient.AddUser({user: user}, (err: any, res: any) => {
+            if (err){
+                // console.error(err);
+                reject(err);
+            }
+            resolve(res.user);
+        })
+    });
+    
+}
+
+async function addAccounts(accounts: Account[], userId: string) {
+    accounts.forEach((account) => {
+        new Promise((resolve, reject) => {
+            userClient.AddAccount({userId: userId, account: account}, (err: any, res: any) => {
+                if (err){
+                    // console.error(err);
+                    reject(err);
+                }
+                resolve(res.account);
+            });
+
+        });
+    });
+}
+
+expose(runAddUsers);

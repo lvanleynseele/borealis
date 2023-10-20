@@ -3,18 +3,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userService = void 0;
 const path = require('path');
 const auroraServer_1 = require("../servers/auroraServer");
-const accountService_1 = require("../account/accountService");
 class UserService {
     constructor() {
     }
     async addUser(user) {
         var _a;
-        await auroraServer_1.auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${(_a = user.accountIds) === null || _a === void 0 ? void 0 : _a.toString()}}')`);
+        if (user.accountIds == undefined) {
+            await auroraServer_1.auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{}')`);
+        }
+        else {
+            await auroraServer_1.auroraClient.query(`INSERT INTO users_2 VALUES ('${user.id}', '${user.name}', '${user.email}', '{${(_a = user.accountIds) === null || _a === void 0 ? void 0 : _a.toString()}}')`);
+        }
         return { user: user };
     }
-    async addAccountToUser(userId, account) {
-        await accountService_1.accountService.addAccount(account);
-        await auroraServer_1.auroraClient.query(`UPDATE users_2 SET accountIds = array_append(accountIds, '${account.id}') WHERE id = ${userId}`);
+    async addAccount(userId, account) {
+        // await accountService.addAccount(account);
+        await auroraServer_1.auroraClient.query(`UPDATE users_2 SET account_ids = array_append(account_ids, '${account.id}') WHERE id = '${userId}'`);
         return { userId: userId, account: account };
     }
     async getUser(id) {

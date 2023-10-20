@@ -4,6 +4,7 @@ import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import {ProtoGrpcType} from "../../proto/transaction";
 import { TransactionServiceHandlers } from '../../proto/transactionPackage/TransactionService'
+import { transactionService } from "../transaction/transactionService";
 
 const PORT = 8084;
 const PROTO_FILE = '../../proto/transaction.proto';
@@ -30,10 +31,13 @@ function getServer() {
     const server = new grpc.Server();
 
     server.addService(transactionPackage.TransactionService.service, {
-        TransactionRequest : (req,res) => {
-            console.log(req.request.amount?.low);
-
-            res(null,null)
+        TransactionRequest : async  (req,res) => {
+            transactionService.transactionRequest(req.request.senderId!, req.request.receiverId!,req.request.amount!)
+            .then((result: any) => {
+                res(null, null)
+            }).catch((err: any) => { 
+                res(err, null);
+            });
         },
     } as TransactionServiceHandlers)
 

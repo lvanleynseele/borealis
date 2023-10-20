@@ -29,7 +29,7 @@ async function loadAllUsers() {
     });
 }
 
-async function runGetUsers(numRequests: number, worker: number ){
+async function runGetUsers(numRequests: number, worker: number){
     await loadAllUsers();
     
     let runtimes: number[] = [];

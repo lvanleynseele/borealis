@@ -49,9 +49,7 @@ function getServer() {
             });
         },
         GetAllAccounts: async (call) => {
-            accountService.getAllAccounts().then((result: any) => {
-                console.log("get all accounts")
-                
+            accountService.getAllAccounts().then((result: any) => {                
                 result.forEach((account: any) => {
                     call.write({...account})
                 })

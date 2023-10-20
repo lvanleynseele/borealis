@@ -14,7 +14,7 @@ function createRandomTransaction(): TransactionRequest {
     let fromAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
     let toAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
 
-    let amount = Math.floor(Math.random() * 10000);
+    let amount = Math.floor(Math.random() * 100);
 
     return {
         senderId: fromAccount.id!,
@@ -57,7 +57,7 @@ async function runTransactions(numRequests: number, worker: number) {
         
         let startTime = process.hrtime();
         
-        const response = await TransactionRequest(transaction).catch((err) => {
+        await TransactionRequest(transaction).catch((err) => {
             console.log(err);
             errors++;
         });
@@ -70,17 +70,14 @@ async function runTransactions(numRequests: number, worker: number) {
 }
 
 async function TransactionRequest(transaction: TransactionRequest) {
-    const response = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
         transactionClient.TransactionRequest(transaction, (err: any, res: any) => {
             if (err){
-                console.error(err);
                 reject(err);
             }
             resolve(res);
         });
     });
-
-    return response;
 }
 
 

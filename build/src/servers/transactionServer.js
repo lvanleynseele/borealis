@@ -26,15 +26,10 @@ exports.startTransactionServer = startTransactionServer;
 function getServer() {
     const server = new grpc.Server();
     server.addService(transactionPackage.TransactionService.service, {
-        TransactionRequest: (req, res) => {
+        TransactionRequest: async (req, res) => {
             transactionService_1.transactionService.transactionRequest(req.request.senderId, req.request.receiverId, req.request.amount)
                 .then((result) => {
-                if (result) {
-                    res(null, null);
-                }
-                else {
-                    res(new Error("Transaction failed"), null);
-                }
+                res(null, null);
             }).catch((err) => {
                 res(err, null);
             });

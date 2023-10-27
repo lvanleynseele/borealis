@@ -28,7 +28,7 @@ function getServer() {
     server.addService(accountPackage.AccountService.service, {
         AddAccount: async (req, res) => {
             accountService_1.accountService.addAccount(req.request).then((result) => {
-                res(null, result.account);
+                res(null, null);
             }).catch((err) => {
                 res(err, null);
             });
@@ -42,7 +42,6 @@ function getServer() {
         },
         GetAllAccounts: async (call) => {
             accountService_1.accountService.getAllAccounts().then((result) => {
-                console.log("get all accounts");
                 result.forEach((account) => {
                     call.write({ ...account });
                 });
@@ -54,7 +53,7 @@ function getServer() {
         },
         UpdateAccount: async (req, res) => {
             accountService_1.accountService.updateAccount(req.request.updatedAccount).then((result) => {
-                res(null, result.account);
+                res(null, null);
             }).catch((err) => {
                 res(err, null);
             });
@@ -68,14 +67,14 @@ function getServer() {
         },
         DebitRequest: (req, res) => {
             accountService_1.accountService.debitRequest(req.request.id, req.request.amount).then((result) => {
-                res(null, result.newBalance);
+                res(null, null);
             }).catch((err) => {
                 res(err, null);
             });
         },
         CreditRequest: (req, res) => {
             accountService_1.accountService.creditRequest(req.request.id, req.request.amount).then((result) => {
-                res(null, result.newBalance);
+                res(null, null);
             }).catch((err) => {
                 res(err, null);
             });

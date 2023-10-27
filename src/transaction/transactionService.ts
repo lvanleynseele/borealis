@@ -13,8 +13,13 @@ export class TransactionService {
 
 
     public async transactionRequest(senderId: string, receiverId: string, amount: Long) {
+        if(senderId == receiverId){
+            throw new Error(`senderId and receiverId cannot be the same`);
+        }
+        
         const sender = await accountService.getAccount(senderId);
         
+        //transaction should fail if insufficient funds
         if(sender.balance! < amount) {
             throw new Error(`Insufficient funds in account ${senderId}`);
         }
@@ -24,9 +29,10 @@ export class TransactionService {
                 let transactionId = uuid().toString();
                 auroraClient.query(`INSERT INTO transactions_1 VALUES ('${senderId}', '${receiverId}', ${amount.low}, '${transactionId}')`)
                 .then((result: any) => {
-                    return true;
+                    return;
                 })
             }).catch((err: any) => {
+                //if debit request fails, place transfer value back in sender account
                 accountService.creditRequest(senderId, amount).finally(() => { 
                     throw new Error(`Failed to credit account ${receiverId}`);
                 });

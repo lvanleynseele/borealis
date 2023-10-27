@@ -11,22 +11,21 @@ class TransactionService {
     async transactionRequest(senderId, receiverId, amount) {
         const sender = await accountService_1.accountService.getAccount(senderId);
         if (sender.balance < amount) {
-            return false;
+            throw new Error(`Insufficient funds in account ${senderId}`);
         }
         accountService_1.accountService.debitRequest(senderId, amount).then((result) => {
             accountService_1.accountService.creditRequest(receiverId, amount).then((result) => {
-                return true;
+                let transactionId = (0, uuid_1.v4)().toString();
+                auroraServer_1.auroraClient.query(`INSERT INTO transactions_1 VALUES ('${senderId}', '${receiverId}', ${amount.low}, '${transactionId}')`)
+                    .then((result) => {
+                    return true;
+                });
             }).catch((err) => {
-                accountService_1.accountService.creditRequest(senderId, amount).finally(() => { });
-                return false;
+                accountService_1.accountService.creditRequest(senderId, amount).finally(() => {
+                    throw new Error(`Failed to credit account ${receiverId}`);
+                });
             });
-        }).catch((err) => {
-            console.log(err);
-            return false;
         });
-        let transactionId = (0, uuid_1.v4)().toString();
-        await auroraServer_1.auroraClient.query(`INSERT INTO transactions_1 VALUES ('${senderId}', '${receiverId}', ${amount.low}, '${transactionId}')`);
-        return false;
     }
 }
 exports.TransactionService = TransactionService;

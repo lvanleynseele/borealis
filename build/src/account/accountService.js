@@ -19,21 +19,16 @@ class AccountService {
         return response.rows;
     }
     async updateAccount(account) {
-        let response = await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET name = '${account.name}', balance = ${account.balance} WHERE id = ${account.id}`);
-        return {
-            ...response.rows[0]
-        };
+        await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET name = '${account.name}', balance = ${account.balance} WHERE id = ${account.id}`);
     }
     async deleteAccount(id) {
         await auroraServer_1.auroraClient.query(`DELETE FROM accounts_1 WHERE id = ${id}`);
     }
     async debitRequest(id, amount) {
-        const response = await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount.low} WHERE id = '${id}'`);
-        return { newBalance: response.rows[0].balance };
+        await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = balance - ${amount.low} WHERE id = '${id}'`);
     }
     async creditRequest(id, amount) {
-        const response = await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount.low} WHERE id = '${id}'`);
-        return { newBalance: response.rows[0].balance };
+        await auroraServer_1.auroraClient.query(`UPDATE accounts_1 SET balance = balance + ${amount.low} WHERE id = '${id}'`);
     }
 }
 exports.accountService = new AccountService();

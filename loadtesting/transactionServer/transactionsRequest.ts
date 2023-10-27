@@ -6,6 +6,7 @@ import { accountClient } from '../../clients/accountClient';
 import { expose } from "threads";
 import { TransactionRequest } from '../../proto/transactionPackage/TransactionRequest';
 import { transactionClient } from '../../clients/transactionClient';
+import { calculateStats, createBaseLoadTestingStats, loadTestingStats } from '../loadTestingInterfaces';
 
 let allAccounts: Account[] = [];
 
@@ -14,7 +15,8 @@ function createRandomTransaction(): TransactionRequest {
     let fromAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
     let toAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
 
-    let amount = Math.floor(Math.random() * 100);
+    //transfer small amount so most transactions go through
+    let amount = Math.floor(Math.random() * 50); 
 
     return {
         senderId: fromAccount.id!,
@@ -44,8 +46,11 @@ async function loadllAccounts() {
 }
 
 
-async function runTransactions(numRequests: number, worker: number) {
+async function runTransactions(numRequests: number, worker: number): Promise<loadTestingStats> {
     await loadllAccounts();
+
+
+    let stats: loadTestingStats = createBaseLoadTestingStats()
 
     let runtimes: number[] = [];
     let errors = 0;
@@ -54,12 +59,12 @@ async function runTransactions(numRequests: number, worker: number) {
 
     for(let i = 0; i < numRequests; i++) {
         let transaction = createRandomTransaction();
-        
+        stats.totalRequests++;
         let startTime = process.hrtime();
         
         await TransactionRequest(transaction).catch((err) => {
-            console.log(err);
-            errors++;
+            console.log(err.message);
+            stats.errors++;
         });
 
         let endTime = process.hrtime(startTime);
@@ -67,6 +72,9 @@ async function runTransactions(numRequests: number, worker: number) {
         runtimes.push(runtime);
     }
 
+    calculateStats(runtimes, stats);
+
+    return stats;
 }
 
 async function TransactionRequest(transaction: TransactionRequest) {
@@ -79,6 +87,5 @@ async function TransactionRequest(transaction: TransactionRequest) {
         });
     });
 }
-
 
 expose(runTransactions);

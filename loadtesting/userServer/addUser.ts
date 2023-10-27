@@ -62,7 +62,6 @@ async function runAddUsers(NUM_REQUESTS: number, worker: number) {
         let endTime = process.hrtime(startTime);
 
         runtimes.push(endTime[0] * 1000000 + endTime[1]);
-        // console.log(`Execution time: ${endTime[0]}s ${endTime[1] / 1000000}ms`);
     }
 
     console.log("Average runtime: " + runtimes.reduce((a, b) => a + b, 0) / runtimes.length);    
@@ -74,7 +73,6 @@ async function addUser(user: User) {
     return new Promise((resolve, reject) => {
         userClient.AddUser({user: user}, (err: any, res: any) => {
             if (err){
-                // console.error(err);
                 reject(err);
             }
             resolve(res.user);

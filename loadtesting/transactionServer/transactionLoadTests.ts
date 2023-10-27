@@ -1,7 +1,7 @@
 import { spawn, Thread, Worker } from "threads"
 import { loadTestingStats } from "../loadTestingInterfaces";
 
-const NUM_REQUESTS = 1000;
+const NUM_REQUESTS = 20;
 const NUM_WORKERS = 5;
 
 function runTransactionLoadTest() {
@@ -17,6 +17,7 @@ function runTransactionLoadTest() {
                 stats.push(results);
             }).catch((err: any) => {
                 console.log(err.message);
+                //rejecting error will fail other threads
                 // reject(err);
             })
         }

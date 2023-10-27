@@ -15,12 +15,13 @@ function createRandomTransaction(): TransactionRequest {
     let fromAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
     let toAccount = allAccounts[Math.floor(Math.random() * allAccounts.length)];
 
-    let amount = Math.floor(Math.random() * 100);
+    //transfer small amount so most transactions go through
+    let amount = Math.floor(Math.random() * 50); 
 
     return {
         senderId: fromAccount.id!,
         receiverId: toAccount.id!,
-        amount: 1 //amount
+        amount: amount
     }
 
 }

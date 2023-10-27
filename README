@@ -1,0 +1,56 @@
+This project was developed to test and explore AWS’ Aurora Serverless PostreSQL database. It is setup as a web transaction tool, a use case determined to be applicable to this service. 
+
+In this service, users can have some set of accounts. Money can be transferred between two given accounts. 
+
+A middleware layer was setup with gRPC. gRPC servers handle both user and account creation, and initializing transactions between accounts. 
+
+The service was containerized using docker with the intention of hosting service with ec2. 
+
+
+
+To Start:
+
+Install packages:
+  - Yarn install
+  - Yarn build
+
+
+Start servers:
+
+  To run locally:
+    - Yarn start
+
+  Run in docker:
+    - Docker build .
+    - Docker compose up
+
+To make individual calls to servers:
+
+  Postman:
+    I found it easiest to make individual calls to service from postman. Instructions on setting up an gRPC service in postman can be found at: 
+https://learning.postman.com/docs/sending-requests/grpc/first-grpc-request/ 
+
+Curl:
+Found this to be significantly more difficult, but I set up routes on each method to have a path. 
+
+Script:
+It is possible to create a script and simply call the existing clients in this project to make calls to the servers
+
+
+Load Testing:
+
+The main purpose of this service is to handle transactions. Although user and account services are setup for load testing, the primary load test is for transactions server/service.
+
+Ensure servers are started (yarn start or docker compose up)
+From separate terminal, run:
+Yarn load:transaction
+
+
+Unit Testing:
+
+There is not much business logic involved in this project, and I intended to simply familiarize myself with the capabilities and tradeoffs of Aurora quickly. For these reasons, particularly the latter, I did not setup unit tests, at least to this point. 
+
+To editorialize a bit, and please feel free to disregard this, I fully acknowledge the importance of unit testing, it is an important part of development for me. But in this project, the value proposition of doing so did not outweigh the tradeoff: taking time away from exposure to new knowledge to ensure values were coming back correctly. Services are quite straightforward, and load testing provided triggered the errors and handling thereof I needed to know where a mistake had been made. 
+
+
+    

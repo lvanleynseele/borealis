@@ -8,11 +8,17 @@ import { startUserServer } from "./src/servers/userServer";
 
 export const account= {};
 
+
+//start gRPC servers for rpc calls
 startUserServer();
 startTransactionServer();
 startAccountServer();
+
+//start server to connect to aurora db 
 startAuroraServer();
 
+//start clients to make calls to gRPC servers
+//initialized clients exported from module
 startUserClient();
 startAccountClient();
 startTransactionClient();
